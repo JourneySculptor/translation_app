@@ -1,4 +1,3 @@
-# Utility functions for Google Cloud Translate API
 from google.cloud import translate_v2 as translate
 import os
 
@@ -7,16 +6,19 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.abspath("service-account-
 translate_client = translate.Client()
 
 # Function to perform text translation
-def translate_text(text: str, target_language: str):
+def translate_text(text: str, target_language: str) -> str:
+    """
+    Translate the given text into the target language using Google Translate API.
+    """
     try:
-        # Translate text
+        # Corrected the usage of translate method
         result = translate_client.translate(text, target_language=target_language)
-        # Return structured response
-        return {
-            "translated_text": result["translatedText"],
-            "detected_source_language": result["detectedSourceLanguage"]
-        }
+        
+        # Ensure "translatedText" key exists in the response
+        translated_text = result.get("translatedText")
+        if not translated_text:
+            raise ValueError("Translation API response missing 'translatedText'")
+        
+        return translated_text
     except Exception as e:
-        # Handle errors gracefully
-        print(f"Error during translation: {e}")
-        return {"error": "Failed to translate text"}
+        raise ValueError(f"Translation API failed: {str(e)}")

@@ -10,7 +10,7 @@ auth_router = APIRouter()
 # Secret key and algorithm for JWT
 SECRET_KEY = "your-secret-key"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 # Define the token scheme
 bearer_scheme = HTTPBearer()
@@ -23,7 +23,7 @@ fake_users_db = {
     }
 }
 
-# Define models
+# Define models for user and token
 class User(BaseModel):
     username: str
     password: str
@@ -32,7 +32,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-# Authenticate user
+# Validate user credentials against the dummy database
 def authenticate_user(username: str, password: str):
     """
     Validate user credentials against the dummy database.
@@ -42,31 +42,46 @@ def authenticate_user(username: str, password: str):
         return User(username=username, password=user["password"])
     return None
 
-# Create a JWT token
+# Generate a JWT token with an expiration time
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     """
     Generate a JWT token with an expiration time.
     """
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=15))
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
+    print(f"Token payload: {to_encode}")  # Debugging
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-# Decode JWT and get the current user
+# Decode the JWT token and extract user information
 async def get_current_user(token: str = Depends(bearer_scheme)):
     """
     Decode the JWT token and extract user information.
     """
     try:
+        # Debug: Print the received token
+        print(f"Received token: {token.credentials}")
+        
+        # Decode the token to extract payload
         payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        
+        # Extract username from payload
         username = payload.get("sub")
-        if username is None:
-            raise HTTPException(status_code=401, detail="Invalid token")
+        
+        # Debug: Print the decoded username
+        print(f"Decoded username: {username}")
+        
+        if not username:
+            raise HTTPException(status_code=401, detail="Token missing username")
+        
+        # Return the authenticated user
         return User(username=username, password="not_returned")
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+    except JWTError as e:
+        # Debug: Print the JWT error
+        print(f"JWT error: {e}")
+        raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
 
-# Define login endpoint
+# Login endpoint to authenticate the user and return a JWT token
 @auth_router.post("/auth/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
@@ -81,7 +96,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-# Define a protected route
+# A protected route that requires a valid JWT token
 @auth_router.get("/auth/protected")
 async def protected_route(current_user: User = Depends(get_current_user)):
     """

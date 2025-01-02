@@ -28,9 +28,14 @@ translation_app/
 ├── models/                      # Pydantic models for API and user handling
 │   ├── user_model.py            # User and UserInDB models
 │   ├── token.py                 # Token models
+│   ├── history_model.py         # Translation history model
 ├── routes/                      # Application routes
 │   ├── translation.py           # Translation API logic
 │   ├── user.py                  # User-related API routes
+│   ├── history.py               # New: Translation history API routes
+├── services/                    # Application services and logic
+│   ├── translate_service.py     # Google Translate integration
+│   ├── history_service.py       # Logic for saving/retrieving history
 ├── utils/                       # Utility functions and helpers
 │   ├── translate.py             # Google Translate integration
 ├── .env                         # Environment variables
@@ -49,6 +54,8 @@ translation_app/
 - **Source Language Detection**: No need to specify the input language—it’s auto-detected.
 - **Developer-Friendly Interface**: Explore endpoints via Swagger UI.
 - **Robust Error Management**: Ensures smooth operation with meaningful error messages.
+- **JWT Authentication**: Secure access to endpoints with token-based authentication.
+
 
 ---
 
@@ -56,8 +63,10 @@ translation_app/
 
 - **FastAPI**: A fast and modern Python web framework.
 - **Google Cloud Translation API**: Industry-leading translation capabilities.
+- **FastAPI-JWT-Auth**: Secure and flexible JWT authentication.
 - **Python-dotenv**: Secure management of environment variables.
 - **Uvicorn**: ASGI server for high-speed API hosting.
+
 
 ---
 
@@ -81,6 +90,41 @@ translation_app/
   }
   ```
 
+### Save Translation History
+- **URL**: `/save-history/`
+- **Method**: `POST`
+- **Parameters**:
+  - `source_text` (string, required): The original text before translation.
+  - `translated_text` (string, required): The translated text.
+- **Response Example**:
+  ```json
+  {
+    "message": "History saved successfully"
+  }
+  ```
+
+### Retrieve Translation History
+- **Response Example**:
+  ```json
+  [
+    {
+      "source_text": "Hello, I hope this message finds you well. I am sharing the meeting materials.",
+      "translated_text": "お世話になっております。会議の資料を共有いたします。",
+      "timestamp": "2025-01-02T06:11:39.753698+00:00"
+    },
+    {
+      "source_text": "Thank you for your email. I will get back to you shortly.",
+      "translated_text": "Gracias por su correo electrónico. Me pondré en contacto con usted en breve.",
+      "timestamp": "2025-01-02T06:12:12.456789+00:00"
+    },
+    {
+      "source_text": "The museum is open from 10 AM to 6 PM. Tickets can be purchased online.",
+      "translated_text": "Das Museum ist von 10 bis 18 Uhr geöffnet. Tickets können online gekauft werden.",
+      "timestamp": "2025-01-02T06:15:45.123456+00:00"
+    }
+  ]
+  ```
+
 ---
 
 ## Setup Instructions
@@ -94,6 +138,10 @@ cd translation_app
 ### 2. Install Dependencies
 ```bash
 pip install -r requirements.txt
+```
+If JWT authentication is not already installed:
+```bash
+pip install fastapi-jwt-auth
 ```
 
 ### 3. Configure Google Cloud API
