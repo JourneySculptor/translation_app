@@ -96,6 +96,7 @@ translation_app/
 - **Parameters**:
   - `source_text` (string, required): The original text before translation.
   - `translated_text` (string, required): The translated text.
+
 - **Response Example**:
   ```json
   {
@@ -126,6 +127,88 @@ translation_app/
   ```
 
 ---
+
+## Translation Examples with Screenshots
+
+Here are some sample translations and their corresponding responses, including screenshots for clarity:
+
+### Example 1: Translating from English to Norwegian
+
+Request Body:
+```json
+{
+  "text": "Thank you for your email. I will get back to you shortly.",
+  "target_language": "no"
+}
+```
+Response Body:
+```json
+{
+  "translated_text": "Takk for e-posten din. Jeg vil kontakte deg snart."
+}
+```
+Screenshot:
+![English to Norwegian Translation Response](images/translate_example_en_no_response.png)
+
+
+### Example 2: Translating from Japanese to French
+
+Request Body:
+```json
+{
+  "text": "このプロジェクトについてのご提案ありがとうございます。",
+  "target_language": "fr"
+}
+```
+Response Body:
+```json
+{
+  "translated_text": "Merci pour votre proposition concernant ce projet."
+}
+```
+Screenshot:
+![Japanese to French Translation Response](images/translate_example_ja_fr_response.png)
+
+
+
+### Example 3: Translating from Danish to English
+
+Request Body:
+```json
+{
+  "text": "Tak for mødet i går. Jeg ser frem til at arbejde sammen med dig.",
+  "target_language": "en"
+}
+```
+Response Body:
+```json
+{
+  "translated_text": "Thank you for the meeting yesterday. I look forward to working with you."
+}
+```
+Screenshot:
+![Danish to English Translation Response](images/translate_example_da_en_response.png)
+
+
+
+### Example 4: Translating from German to English
+
+Request Body:
+```json
+{
+  "text": "Vielen Dank für Ihre Unterstützung bei diesem Projekt.",
+  "target_language": "en"
+}
+```
+Response Body:
+```json
+{
+  "translated_text": "Thank you for your support in this project."
+}
+```
+Screenshot:
+![German to English Translation Response](images/translate_example_de_en_response.png)
+
 
 ## Setup Instructions
 
