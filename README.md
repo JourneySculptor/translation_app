@@ -146,7 +146,7 @@ translation_app/
 }
 ```
 **Screenshot**:
-![English to Norwegian Translation Response](https://raw.githubusercontent.com/yourusername/translation_app/main/images/translate_example_en_no_response.png)
+![English to Norwegian Translation Response](https://raw.githubusercontent.com/JourneySculptor/translation_app/main/images/translate_example_en_no_response.png)
 
 ### Example 2: Translating from Japanese to French
 
@@ -164,7 +164,7 @@ translation_app/
 }
 ```
 **Screenshot**:
-![Japanese to French Translation Response](https://raw.githubusercontent.com/yourusername/translation_app/main/images/translate_example_ja_fr_response.png)
+![Japanese to French Translation Response](https://raw.githubusercontent.com/JourneySculptor/translation_app/main/images/translate_example_ja_fr_response.png)
 
 ---
 
