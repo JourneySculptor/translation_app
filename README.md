@@ -32,7 +32,7 @@ translation_app/
 ├── routes/                      # Application routes
 │   ├── translation.py           # Translation API logic
 │   ├── user.py                  # User-related API routes
-│   ├── history.py               # New: Translation history API routes
+│   ├── history.py               # API route to clear translation history
 ├── services/                    # Application services and logic
 │   ├── translate_service.py     # Google Translate integration
 │   ├── history_service.py       # Logic for saving/retrieving history
@@ -55,6 +55,7 @@ translation_app/
 - **Developer-Friendly Interface**: Explore endpoints via Swagger UI.
 - **Robust Error Management**: Ensures smooth operation with meaningful error messages.
 - **JWT Authentication**: Secure access to endpoints with token-based authentication.
+- **Clear Translation History**: Easily reset all saved translation data.
 
 
 ---
@@ -124,6 +125,17 @@ translation_app/
       "timestamp": "2025-01-02T06:15:45.123456+00:00"
     }
   ]
+  ```
+
+### Clear Translation History
+- **URL**: `/history/clear-history`
+- **Method**: `DELETET`
+- **Description**: Deletes all saved translation history entries.
+- **Response Example**:
+  ```json
+  {
+    "message": "All translation history has been cleared."
+  }
   ```
 
 ---
