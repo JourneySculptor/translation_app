@@ -214,7 +214,10 @@ This deployment process demonstrates proficiency in **cloud deployment pipelines
 
 ## Deployed URL
 
-Access the live application: [Translation App](https://translation-app-883938623305.asia-northeast1.run.app)
+- **Access the live application**: [Translation App](https://translation-app-883938623305.asia-northeast1.run.app)
+- **Swagger UI**(for interactive API testing): [Swagger Documentation](https://translation-app-883938623305.asia-northeast1.run.app/docs)
+
+
 
 ---
 
