@@ -10,7 +10,7 @@ auth_router = APIRouter()
 # Secret key and algorithm for JWT
 SECRET_KEY = "your-secret-key"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = 15
 
 # Define the token scheme
 bearer_scheme = HTTPBearer()

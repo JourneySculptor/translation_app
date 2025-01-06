@@ -55,6 +55,8 @@ translation_app/
 - **Developer-Friendly Interface**: Explore endpoints via Swagger UI.
 - **Robust Error Management**: Ensures smooth operation with meaningful error messages.
 - **JWT Authentication**: Secure access to endpoints with token-based authentication.
+  - Login endpoint (`/auth/login`) generates a JWT token upon successful authentication.
+  - Token-protected endpoints require a valid token in the `Authorization` header.
 - **Clear Translation History**: Easily reset all saved translation data.
 
 ---
@@ -71,9 +73,67 @@ translation_app/
 
 ## API Endpoints
 
-### Translate Text
+### Authentication Endpoints
+
+- **Token Expiry**: The issued token expires after **15 minutes**. A new token must be obtained by logging in again.
+
+- **Error Examples**:
+  - Invalid Token:
+    ```json
+    {
+      "detail": "Invalid token: Signature verification failed."
+    }
+    ```
+  - Expired Token:
+    ```json
+    {
+      "detail": "Invalid token: Signature has expired."
+    }
+    ```
+
+#### Login (Authenticate User)
+- **URL**: `/auth/login`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "username": "testuser",
+    "password": "password"
+  }
+  ```
+  - **Response Example**:
+  ```json
+  {
+    "access_token": "your-jwt-token",
+    "token_type": "bearer"
+  }
+  ```
+**Protected Route**
+- **URL**: `/auth/protected`
+- **Method**: `GET`
+- **Headers**:
+  - Authorization: Bearer {your-jwt-token} (Required)
+
+- **Response Example**:
+  ```json
+  {
+    "message": "Welcome, testuser!"
+  }
+  ```
+- **Error Example**:
+  ```json
+  {
+    "detail": "Invalid token: Signature has expired."
+  }
+  ```
+
+### Translation Endpoints
+
+#### Translate Text
 - **URL**: `/translation/translate`
 - **Method**: `POST`
+- **Headers**:
+  - `Authorization`: Bearer {your-jwt-token} (Required)
 - **Request Body**:
   ```json
   {
@@ -89,9 +149,13 @@ translation_app/
   }
   ```
 
-### Save Translation History
+### Translation History Endpoints
+
+#### Save Translation History
 - **URL**: `/save-history/`
 - **Method**: `POST`
+- **Headers**:
+  - `Authorization`: Bearer {your-jwt-token} (Required)
 - **Parameters**:
   - `source_text` (string, required): The original text before translation.
   - `translated_text` (string, required): The translated text.
@@ -103,7 +167,8 @@ translation_app/
   }
   ```
 
-### Retrieve Translation History
+#### Retrieve Translation History
+
 - **Response Example**:
   ```json
   [
@@ -115,9 +180,11 @@ translation_app/
   ]
   ```
 
-### Clear Translation History
+#### Clear Translation History
 - **URL**: `/history/clear-history`
 - **Method**: `DELETE`
+- **Headers**:
+  - `Authorization`: Bearer {your-jwt-token} (Required)
 - **Description**: Deletes all saved translation history entries.
 - **Response Example**:
   ```json
@@ -165,6 +232,63 @@ translation_app/
 ```
 **Screenshot**:
 ![Japanese to French Translation Response](https://raw.githubusercontent.com/JourneySculptor/translation_app/main/images/translate_example_ja_fr_response.png)
+
+---
+
+### Swagger UI Examples
+
+#### Login Endpoint (`POST /auth/login`)
+This screenshot demonstrates the response from the login endpoint when valid credentials are provided.
+
+![Login Endpoint Example](images/swagger_login_endpoint.png)
+
+#### Protected Endpoint (`GET /auth/protected`)
+This screenshot shows how to authorize and access the protected endpoint using a valid JWT token.
+
+![Protected Endpoint Example](images/swagger_protected_endpoint.png)
+
+
+---
+
+### Error Handling
+
+The Translation API provides clear error responses for various scenarios. Below are common examples:
+
+#### Authentication Errors
+- **Invalid Token**:
+  ```json
+  {
+    "detail": "Invalid token: Signature verification failed."
+  }
+  ```
+  - **Cause**: The provided token has been tampered with or is incorrect.
+  - **Solution**: Ensure that a valid token is being used.
+
+- **Expired Token**:
+  ```json
+  {
+    "detail": "Invalid token: Signature has expired."
+  }
+  ```
+  - **Cause**: The token has exceeded its validity period (15 minutes).
+  - **Solution**: Log in again to obtain a new token.
+
+#### Missing Authorization Header
+- **Response Example**:
+  ```json
+  {
+    "detail": "Not authenticated"
+  }
+  ```
+
+#### Invalid Request Body
+If the request body is malformed or missing required fields:
+- **Response Example**:
+  ```json
+  {
+    "detail": "Invalid request body"
+  }
+  ```
 
 ---
 
@@ -224,12 +348,15 @@ This deployment process demonstrates proficiency in **cloud deployment pipelines
 ## Future Improvements
 
 This project is ready for real-world deployment and can be further enhanced:
-- **Batch Processing**: Support translation of multiple texts in a single request.
-- **Speech-to-Text Integration**: Extend functionality with audio processing.
-- **Enhanced Authentication**: Implement OAuth2 for improved security.
-- **Usage Analytics**: Integrate Google Analytics or a custom dashboard to track translation requests and user engagement.
-- **Multi-Cloud Deployment**: Add support for other cloud platforms like AWS Lambda or Azure Functions.
-- **End-to-End Tests**: Implement automated testing pipelines using Pytest or similar frameworks.
+1. **Token Refresh Mechanism** (High Priority): 
+  Introduce refresh tokens to improve the authentication flow for longer sessions.  
+  Example: Add a `/auth/refresh` endpoint to issue new access tokens when provided with a valid refresh token.
+2. **Batch Processing** (Medium Priority): 
+  SuppSupport translation of multiple texts in a single request to save time for bulk translations.
+3. **Enhanced Authentication** (Medium Priority): 
+  Implement OAuth2 for improved security and compatibility with third-party applications.
+4. **Speech-to-Text Integration** (Low Priority): 
+  Extend functionality with audio processing for more versatile use cases.
 
 ---
 
