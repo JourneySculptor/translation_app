@@ -73,7 +73,7 @@ translation_app/
 
 ## API Endpoints
 
-### Authentication Endpoints
+### Authentication Endpoint
 
 - **Token Expiry**: The issued token expires after **15 minutes**. A new token must be obtained by logging in again.
 
@@ -91,7 +91,7 @@ translation_app/
     }
     ```
 
-#### Login (Authenticate User)
+#### Login Endpoint
 - **URL**: `/auth/login`
 - **Method**: `POST`
 - **Request Body**:
@@ -108,12 +108,12 @@ translation_app/
     "token_type": "bearer"
   }
   ```
-**Protected Route**
+
+#### Protected Endpoint
 - **URL**: `/auth/protected`
 - **Method**: `GET`
 - **Headers**:
-  - Authorization: Bearer {your-jwt-token} (Required)
-
+  - `Authorization`: Bearer {your-jwt-token} (Required)
 - **Response Example**:
   ```json
   {
@@ -333,6 +333,23 @@ This application is containerized and deployed on Google Cloud Run for scalable,
    - [Translation App](https://translation-app-883938623305.asia-northeast1.run.app)
 
 This deployment process demonstrates proficiency in **cloud deployment pipelines** and **serverless architecture**.
+
+### 5. Test the API Endpoints
+You can use the provided `request_translation.py` script to test the API functionality.
+
+1. **Ensure the FastAPI server is running locally** at `http://127.0.0.1:8000`.
+2. **Run the test script** from the terminal:
+   ```bash
+   python request_translation.py
+   ```
+3. **What the script does**:
+  - Logs in to the API and retrieves a token.
+  - Tests the translation endpoint with the token.
+  - Clears the translation history.
+4. **Expected Output**:
+  - A successful login and token retrieval.
+  - A valid translation response (e.g., "flower").
+  - Confirmation that the history has been cleared.
 
 ---
 
