@@ -26,16 +26,21 @@ This project showcases proficiency in:
 translation_app/
 ├── main.py                      # Main application file
 ├── auth.py                      # Authentication and JWT logic
+├── settings.py                  # Configuration for environment variables and application settings
+├── dependencies.py              # Dependency injection for application components
 ├── models/                      # Pydantic models for API and user handling
+│   ├── __init__.py              # Init file for models module
 │   ├── token.py                 # Token models
 │   ├── history_model.py         # Translation history model
 │   ├── translation_model.py     # Models for translation requests
 ├── routes/                      # Application routes
+│   ├── __init__.py              # Init file for routes module
 │   ├── translation.py           # Translation API logic
 │   ├── history.py               # History management routes
 ├── services/                    # Business logic for the application
 │   ├── history_service.py       # History management logic
 ├── utils/                       # Utility functions
+│   ├── __init__.py              # Init file for utils module
 │   ├── translate.py             # Google Translate interaction
 ├── Dockerfile                   # Docker configuration
 ├── requirements.txt             # Python dependencies
@@ -213,7 +218,7 @@ translation_app/
     ],
     "requested_by": "testuser"
   }
-
+  ```
 ---
 
 ## Translation Examples with Screenshots
@@ -267,7 +272,6 @@ This screenshot demonstrates the response from the login endpoint when valid cre
 This screenshot shows how to authorize and access the protected endpoint using a valid JWT token.
 
 ![Protected Endpoint Example](images/swagger_protected_endpoint.png)
-
 
 ---
 
@@ -323,9 +327,24 @@ cd translation_app
 
 ### 2. Create a Virtual Environment and Install Dependencies
 ```bash
-gpython -m venv venv
+python -m venv venv
 .\venv\Scripts\activate
 pip install -r requirements.txt
+```
+
+The application requires the following environment variables to be configured in a `.env` file:
+
+- `GOOGLE_APPLICATION_CREDENTIALS`: Path to the Google Cloud service account key JSON file used for authentication.
+- `SECRET_KEY`: A secret key used for signing and verifying JWT tokens.
+- `ALGORITHM`: The algorithm used for JWT token signing (e.g., `HS256`).
+- `ACCESS_TOKEN_EXPIRE_MINUTES`: The expiration time for access tokens, in minutes (e.g., `15`).
+
+#### Example `.env` File
+```plaintext
+GOOGLE_APPLICATION_CREDENTIALS=service-account-key.json
+SECRET_KEY=your-secret-key
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=15
 ```
 
 ### 3. Configure Google Cloud API
@@ -333,21 +352,11 @@ pip install -r requirements.txt
 - Create and download a **service account key** JSON file.
 - Save the file in the project directory as `service-account-key.json`.
 
-- **Set Up Environment Variables**:
-  Create a `.env` file in the project root with the following content:
-  ```plaintext
-  GOOGLE_APPLICATION_CREDENTIALS=service-account-key.json
-  SECRET_KEY=your-secret-key
-  ALGORITHM=HS256
-  ACCESS_TOKEN_EXPIRE_MINUTES=15
-  ```
-
 ### 4. Start the Application Locally
 ```bash
 uvicorn main:app --reload
 ```
 - Local Swagger UI: `http://127.0.0.1:8000/docs`
-
 
 ### 5. Docker Setup (Optional for Deployment)
 **Build the Docker Image**
@@ -377,25 +386,27 @@ gcloud run deploy translation-app \
 - After deployment, access the application at the provided **Service URL**.
   - Deployed Swagger UI: `https://translation-app-883938623305.asia-northeast1.run.app/docs`
 
-
 ---
 
 ## Deployed URL
 
 - **Access the live application**: [Translation App](https://translation-app-883938623305.asia-northeast1.run.app)
-- **Swagger UI**(for interactive API testing): [Swagger Documentation](https://translation-app-883938623305.asia-northeast1.run.app/docs)
-
-
+  (Replace with your service URL if deployed to a different environment.)
+- **Swagger UI** (for interactive API testing): [Swagger Documentation](https://translation-app-883938623305.asia-northeast1.run.app/docs)
 
 ---
 
 ## Future Enhancements
 
-This project is ready for real-world deployment and can be further enhanced:
+This project is ready for real-world deployment and can be further enhanced with the following features:
+
 1. **Token Refresh Mechanism** (High Priority):  
-  Add a `/auth/refresh` endpoint to allow token renewal without re-login, improving user experience during long sessions.  
-  Example:
-  ```json
+   Implement a `/auth/refresh` endpoint to allow token renewal without requiring re-login, enhancing user experience during long sessions.  
+   **Implementation Plan**:  
+   - Add a `refresh_token` model to store long-lived tokens in a secure way.
+   - Create a `/auth/refresh` route that validates the refresh token and generates a new access token.  
+   **Example**:
+   ```json
    POST /auth/refresh
    Headers:
      Authorization: Bearer {refresh_token}
@@ -406,11 +417,11 @@ This project is ready for real-world deployment and can be further enhanced:
      }
   ```
 2. **Advanced Error Handling** (Medium Priority): 
-  Improve responses for malformed requests.
+  Improve error responses for malformed or unsupported requests. This includes detailed error messages and HTTP status codes for edge cases.
 3. **OAuth2 Integration** (Medium Priority): 
-  Enable third-party app connections.
+  Implement OAuth2 authentication to allow integration with third-party applications, enhancing compatibility and security.
 4. **Speech-to-Text Integration** (Low Priority): 
-  Extend functionality with audio processing for more versatile use cases.
+  Extend the service with speech-to-text functionality to support audio-based translations, expanding the application’s use cases.
 
 ---
 
