@@ -1,6 +1,6 @@
 # Translation API
 
-**A FastAPI-based translation service** powered by Google Cloud Translation API. This project demonstrates expertise in **API development**, **cloud integration**, and **backend engineering**—tailored for professional portfolios and global job applications.
+**A FastAPI-based translation service** powered by Google Cloud Translation API. This project demonstrates expertise in **API development**, **cloud integration**, **containerization**, and **backend engineering**—designed for professional portfolios and global job applications.
 
 ---
 
@@ -9,12 +9,14 @@
 The **Translation API** enables seamless text translation with:
 - **Language Detection**: Automatically identifies the source language.
 - **Text Translation**: Converts text into the specified target language.
+- **Batch Translation**: Translates multiple texts in a single request.
 - **Error Handling**: Provides clear responses for invalid or unsupported requests.
 
 This project showcases proficiency in:
 - Developing RESTful APIs using FastAPI.
 - Integrating Google Cloud services.
-- Deploying high-performance applications.
+- Deploying high-performance, containerized applications.
+- Secure authentication with JWT.
 
 ---
 
@@ -25,15 +27,13 @@ translation_app/
 ├── main.py                      # Main application file
 ├── auth.py                      # Authentication and JWT logic
 ├── models/                      # Pydantic models for API and user handling
-│   ├── user_model.py            # User and UserInDB models
 │   ├── token.py                 # Token models
 │   ├── history_model.py         # Translation history model
+│   ├── translation_model.py     # Models for translation requests
 ├── routes/                      # Application routes
 │   ├── translation.py           # Translation API logic
-│   ├── user.py                  # User-related API routes
-│   ├── history.py               # Clear history API routes
+│   ├── history.py               # History management routes
 ├── services/                    # Business logic for the application
-│   ├── translate_service.py     # Google Translate integration
 │   ├── history_service.py       # History management logic
 ├── utils/                       # Utility functions
 │   ├── translate.py             # Google Translate interaction
@@ -51,13 +51,12 @@ translation_app/
 ## Features
 
 - **Effortless Translation**: Supports multiple languages for accurate translation.
-- **Source Language Detection**: No need to specify the input language—it’s auto-detected.
-- **Developer-Friendly Interface**: Explore endpoints via Swagger UI.
-- **Robust Error Management**: Ensures smooth operation with meaningful error messages.
-- **JWT Authentication**: Secure access to endpoints with token-based authentication.
-  - Login endpoint (`/auth/login`) generates a JWT token upon successful authentication.
-  - Token-protected endpoints require a valid token in the `Authorization` header.
-- **Clear Translation History**: Easily reset all saved translation data.
+- **Source Language Detection**: Automatically detects the input language.
+- **Batch Translation**: Efficiently processes multiple texts in one request.
+- **Developer-Friendly Interface**: Swagger UI for interactive API testing.
+- **Secure Authentication**: Token-based JWT protection for all endpoints.
+- **Translation History Management**: Save, retrieve, and clear translation logs with ease.
+- **Containerized Deployment**: Ready for Docker and Google Cloud Run.
 
 ---
 
@@ -193,6 +192,28 @@ translation_app/
   }
   ```
 
+#### Batch Translate
+- **URL**: `/translation/batch-translate`
+- **Method**: `POST`
+- **Headers**:
+  - `Authorization`: Bearer {your-jwt-token} (Required)
+- **Request Body**:
+  ```json
+  {
+    "texts": ["hello", "goodbye"],
+    "target_language": "es"
+  }
+  ```
+- **Response Example**:
+  ```json
+  {
+    "translations": [
+      {"source_text": "hello", "translated_text": "hola"},
+      {"source_text": "goodbye", "translated_text": "adios"}
+    ],
+    "requested_by": "testuser"
+  }
+
 ---
 
 ## Translation Examples with Screenshots
@@ -300,8 +321,10 @@ git clone https://github.com/yourusername/translation_app.git
 cd translation_app
 ```
 
-### 2. Install Dependencies
+### 2. Create a Virtual Environment and Install Dependencies
 ```bash
+gpython -m venv venv
+.\venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -310,46 +333,50 @@ pip install -r requirements.txt
 - Create and download a **service account key** JSON file.
 - Save the file in the project directory as `service-account-key.json`.
 
-### 4. Deploy to Google Cloud Run
-This application is containerized and deployed on Google Cloud Run for scalable, serverless execution. Follow these steps to deploy:
+- **Set Up Environment Variables**:
+  Create a `.env` file in the project root with the following content:
+  ```plaintext
+  GOOGLE_APPLICATION_CREDENTIALS=service-account-key.json
+  SECRET_KEY=your-secret-key
+  ALGORITHM=HS256
+  ACCESS_TOKEN_EXPIRE_MINUTES=15
+  ```
 
-1. Build the Docker image:
-   ```bash
-   docker build -t asia-northeast1-docker.pkg.dev/translation-app-443313/translation-repo/translation_app:latest .
-   ```
-2. Push the Docker image to Google Artifact Registry:
-   ```bash
-   docker push asia-northeast1-docker.pkg.dev/translation-app-443313/translation-repo/translation_app:latest
-   ```
-3. Deploy the container to Google Cloud Run:
-   ```bash
-   gcloud run deploy translation-app \
-       --image=asia-northeast1-docker.pkg.dev/translation-app-443313/translation-repo/translation_app:latest \
-       --platform=managed \
-       --region=asia-northeast1 \
-       --allow-unauthenticated
-   ```
-4. Once deployed, access the application at the provided **Service URL**:
-   - [Translation App](https://translation-app-883938623305.asia-northeast1.run.app)
+### 4. Start the Application Locally
+```bash
+uvicorn main:app --reload
+```
+- Local Swagger UI: `http://127.0.0.1:8000/docs`
 
-This deployment process demonstrates proficiency in **cloud deployment pipelines** and **serverless architecture**.
 
-### 5. Test the API Endpoints
-You can use the provided `request_translation.py` script to test the API functionality.
+### 5. Docker Setup (Optional for Deployment)
+**Build the Docker Image**
+```bash
+docker build -t translation_app .
+```
+**Run the Docker Container**
+```bash
+docker run -p 8080:8080 translation_app
+```
+- Access the application at `http://localhost:8080`.
 
-1. **Ensure the FastAPI server is running locally** at `http://127.0.0.1:8000`.
-2. **Run the test script** from the terminal:
-   ```bash
-   python request_translation.py
-   ```
-3. **What the script does**:
-  - Logs in to the API and retrieves a token.
-  - Tests the translation endpoint with the token.
-  - Clears the translation history.
-4. **Expected Output**:
-  - A successful login and token retrieval.
-  - A valid translation response (e.g., "flower").
-  - Confirmation that the history has been cleared.
+### 6. Deployment to Google Cloud Run
+**Build and Push Docker Image**
+```bash
+docker build -t gcr.io/your-project-id/translation_app:latest .
+docker push gcr.io/your-project-id/translation_app:latest
+```
+**Deploy to Google Cloud Run**
+```bash
+gcloud run deploy translation-app \
+    --image=gcr.io/your-project-id/translation_app:latest \
+    --platform=managed \
+    --region=us-central1 \
+    --allow-unauthenticated
+```
+- After deployment, access the application at the provided **Service URL**.
+  - Deployed Swagger UI: `https://translation-app-883938623305.asia-northeast1.run.app/docs`
+
 
 ---
 
@@ -362,16 +389,26 @@ You can use the provided `request_translation.py` script to test the API functio
 
 ---
 
-## Future Improvements
+## Future Enhancements
 
 This project is ready for real-world deployment and can be further enhanced:
-1. **Token Refresh Mechanism** (High Priority): 
-  Introduce refresh tokens to improve the authentication flow for longer sessions.  
-  Example: Add a `/auth/refresh` endpoint to issue new access tokens when provided with a valid refresh token.
-2. **Batch Processing** (Medium Priority): 
-  SuppSupport translation of multiple texts in a single request to save time for bulk translations.
-3. **Enhanced Authentication** (Medium Priority): 
-  Implement OAuth2 for improved security and compatibility with third-party applications.
+1. **Token Refresh Mechanism** (High Priority):  
+  Add a `/auth/refresh` endpoint to allow token renewal without re-login, improving user experience during long sessions.  
+  Example:
+  ```json
+   POST /auth/refresh
+   Headers:
+     Authorization: Bearer {refresh_token}
+   Response:
+     {
+       "access_token": "new-access-token",
+       "token_type": "bearer"
+     }
+  ```
+2. **Advanced Error Handling** (Medium Priority): 
+  Improve responses for malformed requests.
+3. **OAuth2 Integration** (Medium Priority): 
+  Enable third-party app connections.
 4. **Speech-to-Text Integration** (Low Priority): 
   Extend functionality with audio processing for more versatile use cases.
 

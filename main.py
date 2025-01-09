@@ -6,6 +6,8 @@ from models.history_model import TranslationHistory
 from services.history_service import save_history, get_history
 from datetime import datetime, timezone
 from routes.history import router as history_router
+from routes.translation import router as translation_router
+from settings import settings  # Import the settings
 import os
 import uvicorn
 
@@ -15,6 +17,9 @@ app = FastAPI()
 # Include authentication and history routers
 app.include_router(auth_router)
 app.include_router(history_router, prefix="/history", tags=["History"])
+
+# Include the translation router (remove `prefix` here)
+app.include_router(translation_router, tags=["Translation"])
 
 # Request model for translation
 class TranslationRequest(BaseModel):

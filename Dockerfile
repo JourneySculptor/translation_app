@@ -13,8 +13,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the entire project code into the container
 COPY . /app/
 
-# Command to run the application using Uvicorn
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+# Environment variables for runtime configuration
+ENV PORT=8080
 
-# Expose the port 8080 for Cloud Run
+# Command to run the application using Uvicorn
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+
+# Expose the port for external access
 EXPOSE 8080

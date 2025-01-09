@@ -11,7 +11,6 @@ def translate_text(text: str, target_language: str) -> str:
     Translate the given text into the target language using Google Translate API.
     """
     try:
-        # Corrected the usage of translate method
         result = translate_client.translate(text, target_language=target_language)
         
         # Ensure "translatedText" key exists in the response
@@ -22,3 +21,4 @@ def translate_text(text: str, target_language: str) -> str:
         return translated_text
     except Exception as e:
         raise ValueError(f"Translation API failed: {str(e)}")
+

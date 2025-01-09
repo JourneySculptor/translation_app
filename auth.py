@@ -8,9 +8,9 @@ from pydantic import BaseModel
 auth_router = APIRouter()
 
 # Secret key and algorithm for JWT
-SECRET_KEY = "your-secret-key"
+SECRET_KEY = "s3cUr3JWTK3yF0rT0k3n2025"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 # Define the token scheme
 bearer_scheme = HTTPBearer()
@@ -49,9 +49,13 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     """
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    to_encode.update({"exp": expire})
-    print(f"Token payload: {to_encode}")  # Debugging
+    to_encode.update({
+        "exp": expire,
+        "type": "access"  
+    })
+    print(f"Token payload: {to_encode}") 
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
 
 # Decode the JWT token and extract user information
 async def get_current_user(token: str = Depends(bearer_scheme)):
@@ -60,10 +64,11 @@ async def get_current_user(token: str = Depends(bearer_scheme)):
     """
     try:
         # Debug: Print the received token
-        print(f"Received token: {token.credentials}")
-        
+        raw_token = token.credentials.split("Bearer ")[-1]  # Remove 'Bearer ' prefix if present
+        print(f"Received raw token: {raw_token}")
+
         # Decode the token to extract payload
-        payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(raw_token, SECRET_KEY, algorithms=[ALGORITHM])
         
         # Extract username from payload
         username = payload.get("sub")
@@ -80,6 +85,7 @@ async def get_current_user(token: str = Depends(bearer_scheme)):
         # Debug: Print the JWT error
         print(f"JWT error: {e}")
         raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
+
 
 # Login endpoint to authenticate the user and return a JWT token
 @auth_router.post("/auth/login")
