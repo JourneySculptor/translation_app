@@ -401,27 +401,28 @@ gcloud run deploy translation-app \
 This project is ready for real-world deployment and can be further enhanced with the following features:
 
 1. **Token Refresh Mechanism** (High Priority):  
-   Implement a `/auth/refresh` endpoint to allow token renewal without requiring re-login, enhancing user experience during long sessions.  
-   **Implementation Plan**:  
-   - Add a `refresh_token` model to store long-lived tokens in a secure way.
-   - Create a `/auth/refresh` route that validates the refresh token and generates a new access token.  
-   **Example**:
-   ```json
-   POST /auth/refresh
-   Headers:
-     Authorization: Bearer {refresh_token}
-   Response:
-     {
-       "access_token": "new-access-token",
-       "token_type": "bearer"
-     }
-  ```
+Implement a `/auth/refresh` endpoint to allow token renewal without requiring re-login, enhancing user experience during long sessions.  
+**Implementation Plan**:  
+- Add a `refresh_token` model to store long-lived tokens in a secure way.
+- Create a `/auth/refresh` route that validates the refresh token and generates a new access token.  
+**Example**:
+```json
+```json
+POST /auth/refresh
+Headers:
+  Authorization: Bearer {refresh_token}
+Response:
+  {
+    "access_token": "new-access-token",
+    "token_type": "bearer"
+  }
+```
 2. **Advanced Error Handling** (Medium Priority): 
-  Improve error responses for malformed or unsupported requests. This includes detailed error messages and HTTP status codes for edge cases.
+Improve error responses for malformed or unsupported requests. This includes detailed error messages and HTTP status codes for edge cases.
 3. **OAuth2 Integration** (Medium Priority): 
-  Implement OAuth2 authentication to allow integration with third-party applications, enhancing compatibility and security.
+Implement OAuth2 authentication to allow integration with third-party applications, enhancing compatibility and security.
 4. **Speech-to-Text Integration** (Low Priority): 
-  Extend the service with speech-to-text functionality to support audio-based translations, expanding the application’s use cases.
+Extend the service with speech-to-text functionality to support audio-based translations, expanding the application’s use cases.
 
 ---
 
